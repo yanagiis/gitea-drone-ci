@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  gitea:
+    image: gitea/gitea:1.13.3
+    ports:
+      - 3000:3000 # for web
+      - 2222:22 # for ssh
+    volumes:
+      - ./data/gitea:/data
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+
+  drone:
+    build: docker/droneci
+    ports:
+      - 3001:8080 # for web
+    volumes:
+      - ./data/drone:/data
+    environment:
+      - DRONE_SERVER_HOST=${DRONE_SERVER_HOST}
+      - DRONE_SERVER_PROTO=http
+      - DRONE_RPC_SECRET=${DRONE_RPC_SECRET}
+      - DRONE_GITEA_CLIENT_ID=${DRONE_GITEA_CLIENT_ID}
+      - DRONE_GITEA_CLIENT_SECRET=${DRONE_GITEA_CLIENT_SECRET}
+      - DRONE_GITEA_SERVER=${DRONE_GITEA_SERVER}
+    restart: always
